@@ -1,21 +1,20 @@
-@Library(['com.optum.jenkins.pipeline.library', 'ecp-shared-jenkins-library']) _
 
 def defaults = [
                  gitProjectName         : '',
-                 githubRepository       : 'ecp',
-                 branchName             : 'master',
-                 dockerRegistry         : 'docker.repo1.uhc.com',
-                 dockerNamespace        : 'ecp',
+                 githubRepository       : 'geryang2481',
+                 branchName             : 'trunk',
+                 dockerRegistry         : 'mybsg2481/registry',
+                 dockerNamespace        : 'bsg',
                  dockerImageName        : '',
-                 dockerImageTag         : 'latest-master',
+                 dockerImageTag         : 'latest-trunk',
                  deploymentEnvironment  : 'dev',
-                 tenant                 : 'ecp',
-                 azureContainerRegistry : 'ecpacrcommon.azurecr.io',
+                 tenant                 : 'bsg',
+                 azureContainerRegistry : 'geryang1.azurecr.io',
                  forceDeployConfig      : false,
-                 dockerCredentialsId    : 'ecp_cicd_service_account',
-                 gitCredentialsId       : 'ecp_cicd_service_account',
-                 azureCredentialsId     : 'ecp-azure-sp-clinical-dev-terraform-ci',
-                 emailRecipients        : 'jonathan_d_jamsa@optum.com,thomas.kiss@optum.com'
+                 dockerCredentialsId    : 'geryang1_cicd_service_account',
+                 gitCredentialsId       : 'geryang1_cicd_service_account',
+                 azureCredentialsId     : 'geryang1-azure-dev-terraform-ci',
+                 emailRecipients        : 'geryang2481@gmail.com'
                ]
 // ... but merge defaults with actual parameters for jobs that supply them
 def config = merge(params, defaults)
