@@ -1,0 +1,28 @@
+@Library(['com.optum.jenkins.pipeline.library', 'ecp-shared-jenkins-library']) _
+
+def isChangeRequest = env.CHANGE_ID ? true : false
+
+// because PR scans are not triggered with parameters, specify the defaults here ...
+def defaults = [
+        scarProjectName          : 'ECP_UHGWM110-025452',
+        scarVersionName          : 'optumcare-medicalmgmt-cm-camunda-service',
+        fortifyExclusions        : '**/pom.xml,**/src/test/**/*,**/src/main/java/**/*',
+        downloadFromScar         : true,
+        uploadToScar             : !isChangeRequest,
+        newIssuesOnly            : isChangeRequest,
+        includeLowPriorityIssues : true,
+        criticalThreshold        : '0',
+        highThreshold            : '0',
+        mediumThreshold          : '0',
+        lowThreshold             : '0',
+        sendAuthorIssueEmail     : true,
+        javaVersion              : '11.0'
+    ]
+
+// ... but merge defaults with actual parameters for jobs that supply them
+def config = merge(params, defaults)
+
+clFortifyMavenScan(config)
+
+
+

@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: optumcare-medicalmgmt-cm-camunda-service
+server:
+  servlet:
+    context-path: /bsg-azure-comm-svc
+logging:
+  level:
+    org:
+      apache:
+        ibatis: WARN
+    javax:
+      activation: WARN
+      springframework: WARN
+      camunda: INFO
+    com:
+      bsg:
+        azure: INFO
+management:
+  endpoints:
+    web:
+      exposure:
+        include: httptrace

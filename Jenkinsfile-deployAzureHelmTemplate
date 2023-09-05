@@ -1,0 +1,23 @@
+@Library(['com.optum.jenkins.pipeline.library', 'ecp-shared-jenkins-library']) _
+
+def defaults = [
+                 gitProjectName         : '',
+                 githubRepository       : 'ecp',
+                 branchName             : 'master',
+                 dockerRegistry         : 'docker.repo1.uhc.com',
+                 dockerNamespace        : 'ecp',
+                 dockerImageName        : '',
+                 dockerImageTag         : 'latest-master',
+                 deploymentEnvironment  : 'dev',
+                 tenant                 : 'ecp',
+                 azureContainerRegistry : 'ecpacrcommon.azurecr.io',
+                 forceDeployConfig      : false,
+                 dockerCredentialsId    : 'ecp_cicd_service_account',
+                 gitCredentialsId       : 'ecp_cicd_service_account',
+                 azureCredentialsId     : 'ecp-azure-sp-clinical-dev-terraform-ci',
+                 emailRecipients        : 'jonathan_d_jamsa@optum.com,thomas.kiss@optum.com'
+               ]
+// ... but merge defaults with actual parameters for jobs that supply them
+def config = merge(params, defaults)
+
+clAzureDeployImage(config)

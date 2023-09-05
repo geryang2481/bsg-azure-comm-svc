@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<springProperty name="appName"
+		source="spring.application.name" defaultValue="BSG" />
+	<timestamp key="timestamp-by-second"
+		datePattern="yyyyMMdd'T'HHmmss" />
+	<springProfile name="!cloud">
+		<appender name="LOCAL"
+			class="ch.qos.logback.core.ConsoleAppender">
+			<encoder>
+				<charset>UTF-8</charset>
+				<Pattern>[{"severity": "%level", "class":
+					"%logger"},\n{"log-message": "%message %exception"}]\n\n</Pattern>
+			</encoder>
+		</appender>
+		<appender name="CONSOLE"
+			class="ch.qos.logback.core.ConsoleAppender">
+			<encoder>
+				<charset>UTF-8</charset>
+				<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %magenta([%thread])
+					%highlight(%-5level) %logger{36}.%M - %msg%n</Pattern>
+			</encoder>
+		</appender>
+	</springProfile>
+	<springProfile name="cloud">
+		<appender name="CONSOLE"
+			class="ch.qos.logback.core.ConsoleAppender">
+			<encoder
+				class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+				<providers>
+					<timestamp>
+						<timeZone>UTC</timeZone>
+					</timestamp>
+					<pattern>
+						<pattern>
+							{
+							"severity": "%level",
+							"service": "${appName:-}",
+							"trace": "%X{X-B3-TraceId:-na}",
+							"span": "%X{X-B3-SpanId:-na}",
+							"parent": "%X{X-B3-ParentSpanId:-na}",
+							"exportable": "%X{X-Span-Export:-na}",
+							"thread": "%thread",
+							"class": "%logger",
+							"request_id": "%X{request_id:-na}",
+							"external_ref_id": "%X{external_ref_id:-na}",
+							"request_ts": "%X{request_ts:-na}",
+							"trans_dur": "%X{trans_dur:-na}",
+							"log-message": "%message %exception",
+							"status": "%X{status:-na}",
+              				"method": "%X{method:-na}",
+              				"uri": "%X{uri:-na}",
+              				"timeTaken": "%X{timeTaken:-na}"
+							}
+						</pattern>
+					</pattern>
+				</providers>
+			</encoder>
+		</appender>
+  <logger name="org.apache.ibatis" level="info" />
+  <logger name="javax.activation" level="info" />
+  <logger name="org.springframework" level="info" />
+  <logger name="org.camunda" level="info" />
+  <logger name="org.camunda.bpm.engine.test" level="info" />
+	</springProfile>
+  <root level="INFO">
+		<appender-ref ref="CONSOLE" />
+	</root>
+</configuration>

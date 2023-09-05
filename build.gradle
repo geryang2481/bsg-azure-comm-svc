@@ -1,0 +1,181 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            //url 'https://repo.spring.io/release'
+            url 'https://plugins.gradle.org/m2/'
+        }
+        maven {
+            url 'https://repo.maven.apache.org/maven2'
+        }
+    }
+    dependencies {
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.7.2'
+        classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3'
+	    classpath 'com.gorylenko.gradle-git-properties:gradle-git-properties:2.3.2'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'jacoco'
+apply plugin: 'org.sonarqube'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'maven-publish'
+apply plugin: 'com.gorylenko.gradle-git-properties'
+
+group = 'com.bsg.azure'
+version = '1.0.0-SNAPSHOT'
+sourceCompatibility = '16'
+
+// Configure gradle to always print stacktrace on build failure
+gradle.startParameter.showStacktrace = ShowStacktrace.ALWAYS
+
+repositories {
+    mavenCentral()
+    maven {
+        //url 'https://repo.spring.io/release'
+        url 'https://plugins.gradle.org/m2/'
+    }
+    maven {
+        url 'https://repo.maven.apache.org/maven2'
+    }
+}
+
+ext {
+    cucumberVersion = '5.2.0'
+}
+
+bootRun {
+    systemProperties = System.properties
+}
+
+dependencies {
+    // Coverity Security Escape Library
+    implementation group: 'com.coverity.security', name: 'coverity-escapers', version: '1.1.1'
+
+    // Spring Boot Dependencies
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation 'org.springframework.data:spring-data-jpa'
+
+    // Servlet API
+    compileOnly('javax.servlet:javax.servlet-api')
+    testCompileOnly('javax.servlet:javax.servlet-api')
+
+    // Basic Java Utility Libraries
+    implementation('org.apache.commons:commons-lang3')
+    implementation('com.google.code.gson:gson:2.9.1')
+    implementation('com.google.guava:guava:31.0.1-jre')
+    compileOnly('org.projectlombok:lombok')
+    annotationProcessor('org.projectlombok:lombok')
+    compileOnly('org.apache.httpcomponents:httpclient:4.5.13')
+
+    // OpenAPI UI Libraries
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.2'
+
+    // Persistence Libraries
+    implementation('com.oracle.ojdbc:ojdbc8:19.3.0.0')
+    implementation('org.springframework:spring-jdbc:5.3.14')
+
+    // Testing Frameworks
+    testImplementation('org.awaitility:awaitility:3.1.6')
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation('org.springframework.security:spring-security-test')
+    testImplementation('io.cucumber:cucumber-java:7.0.0')
+    testImplementation('io.cucumber:cucumber-junit:7.0.0')
+    testImplementation('org.hamcrest:hamcrest:2.2')
+    
+    // Jackson Faster XML Core
+    implementation('com.fasterxml.jackson.core:jackson-databind:2.13.2.2')
+    implementation('com.fasterxml.jackson.core:jackson-annotations:2.13.2')
+    implementation('com.fasterxml.jackson.core:jackson-core:2.13.2')
+    
+    // JAX-B
+    runtimeOnly(group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1') 
+    runtimeOnly(group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '4.0.0-M4') 
+    runtimeOnly(group: 'com.sun.xml.bind', name: 'jaxb-core', version: '4.0.0-M4')
+    
+    // Security Fixes
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.32'
+    //implementation group: 'org.libjpegturbo', name: 'turbojpeg-wrapper', version: '1.2.1.5'
+
+    // Other Dependencies
+    implementation 'com.jayway.jsonpath:json-path'
+    implementation 'org.json:json:20200518'
+    implementation 'org.postgresql:postgresql:42.2.0'
+    implementation 'org.springframework:spring-aop'
+    implementation 'org.aspectj:aspectjrt'
+    implementation 'org.aspectj:aspectjweaver'
+    implementation 'org.hibernate:hibernate-hikaricp'
+    implementation 'com.vladmihalcea:hibernate-types-52:2.2.2'
+    implementation 'net.logstash.logback:logstash-logback-encoder:5.1'
+    implementation 'org.codehaus.groovy:groovy-all:2.5.6'
+
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'org.springframework.boot:spring-boot-starter-parent:2.7.2'
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact bootJar
+        }
+    }
+}
+
+jar {
+    enabled = false
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+springBoot {
+    buildInfo()
+}
+
+task copyDockerfile(type: Copy) {
+    from 'src/main/docker'
+    into 'build/docker'
+}
+
+task copyDeployFiles(type: Copy) {
+    from 'src/main/deploy'
+    into 'build/deploy'
+}
+
+compileJava {
+    dependsOn copyDockerfile
+    dependsOn copyDeployFiles
+}
+
+sonarqube {
+    properties {
+        property 'sonar.projectName', '${project.name}'
+        property 'sonar.projectKey', '${project.group}:${project.name}'
+        property 'sonar.coverage.exclusions', '**/azure/**'
+        property 'sonar.exclusions', '**/azure/**'
+        // property 'sonar.host.url', 'http://<HOST>:<PORT>'
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+    }
+}
