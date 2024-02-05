@@ -45,13 +45,13 @@ az aks create --name MyAKSCluster --resource-group MyResourceGroup
 4.b.1. Clone the **repository**
 
 ```bash
-git clone https://github.com/your-repo/azure-communication-demo.git
+git clone https://github.com/geryang2481/bsg-azure-comm-svc.git
 ```
 
 4.b.2. Navigate to the **project directory**
 
 ```bash
-cd azure-communication-demo
+cd bsg-azure-comm-svc
 ```
 
 4.b.3. Build the project with **Gradle**
@@ -64,7 +64,7 @@ cd azure-communication-demo
 4.b.4. Build the **Docker** image
 
 ```bash
-docker build -t azure-communication-demo .
+docker build -t bsg-azure-comm-svc
 ```
 
 4.b.5. Deploy to **Azure Kubernetes Service (AKS)**
@@ -78,7 +78,7 @@ kubectl apply -f deployment.yaml
 4.c.1. After deployment, you can access the service via the external IP provided by **AKS**.
 
 ```bash
-kubectl get svc azure-communication-demo-service
+kubectl get svc bsg-azure-comm-svc
 ```
 
 4.c.2. Go to **URL** site on your browser.

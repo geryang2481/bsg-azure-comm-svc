@@ -1,16 +1,16 @@
 apiVersion: v1
 metadata:
   # Required Properties
-  askId: UHGWM110-025452
-  caAgileId: 366199378300ud
-  projectKey: com.optum.ecp:optumcare-medicalmgmt-cm-camunda-service
-  projectFriendlyName: optumcare-medicalmgmt-cm-camunda-service
-  projectName: optumcare-medicalmgmt-cm-camunda-service
+  askId: bsg-azure-comm-svc
+  caAgileId: bsg-azure-comm-svc
+  projectKey: bsg-azure-comm-svc
+  projectFriendlyName: bsg-azure-comm-svc
+  projectName: bsg-azure-comm-svc
   componentType: code
   # Sonar Properties
   targetQG: GATE_08
   # Fortify properties
   translateExclusions: src/test/**/*
   scanType: cloud
-  scarProjectVersion: optumcare-medicalmgmt-cm-camunda-service
-  scarProjectName: ECP_UHGWM110-025452
+  scarProjectVersion: bsg-azure-comm-svc
+  scarProjectName: bsg-azure-comm-svc

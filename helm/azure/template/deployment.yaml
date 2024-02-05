@@ -1,0 +1,56 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }}
+  labels:
+    app: {{ .Values.appName }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    template: {{ .Template.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.appName }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 50%
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appName }}
+    spec:
+      {{- if .Values.includeNodePoolSelector }}
+      nodeSelector:
+        pool: {{ .Values.nodePoolSelector }}
+      {{- end }}
+      containers:
+        - image: {{ .Values.containerRegistry }}/{{ .Values.imageName | default .Values.appName }}:{{ .Values.imageTag }}
+          imagePullPolicy: Always
+          name: {{ .Values.appName }}
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.appName }}-config-map
+            - secretRef:
+                name: {{ .Values.appName }}-secrets
+      {{- if .Values.includetolerations }}
+      tolerations:
+      - key: {{ .Values.tolerationsKey }}
+        operator: "Equal"
+        value: {{ .Values.tolerationsValue }}
+        effect: "NoSchedule"
+      {{- end }}
